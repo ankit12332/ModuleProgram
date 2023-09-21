@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ModuleProgram.Context;
+using ModuleProgram.Interfaces;
+using ModuleProgram.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 
 // Configure UserRepository with dependency injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
