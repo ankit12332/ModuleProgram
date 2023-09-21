@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 
+// Configure UserRepository with dependency injection
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
