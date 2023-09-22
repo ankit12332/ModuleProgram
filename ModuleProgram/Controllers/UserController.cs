@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ModuleProgram.Interfaces;
 using ModuleProgram.Models;
+using ModuleProgram.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,11 +12,29 @@ namespace ModuleProgram.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly UserService _userService;
+        private readonly JwtService _jwtService;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, JwtService jwtService, UserService userService)
         {
             _userRepository = userRepository;
+            _jwtService = jwtService;
+            _userService = userService;
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest loginRequest)
+        {
+            var response = await _userService.AuthenticateUserAsync(loginRequest);
+
+            if (response == null)
+            {
+                return Unauthorized("Invalid username or password."); // Authentication failed
+            }
+
+            return Ok(response); // Return the LoginResponse object as JSON
+        }
+
 
         // GET api/User
         [HttpGet]

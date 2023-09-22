@@ -9,5 +9,7 @@ namespace ModuleProgram.Interfaces
         Task<User> CreateUserAsync(User user);
         Task UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(int id);
+
+        Task<User?> GetUserByUsernameAsync(string username);
     }
 }

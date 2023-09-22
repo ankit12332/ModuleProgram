@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ModuleProgram.Context;
 using ModuleProgram.Interfaces;
 using ModuleProgram.Repositories;
+using ModuleProgram.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +18,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 
+// Configure JWT authentication
+builder.Services.AddScoped<JwtService>();
+
 // Configure UserRepository with dependency injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
+
 
 var app = builder.Build();
 
@@ -27,6 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication(); // Enable JWT authentication
 
 app.UseAuthorization();
 

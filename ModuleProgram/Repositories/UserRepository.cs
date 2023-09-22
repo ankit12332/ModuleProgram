@@ -55,5 +55,16 @@ namespace ModuleProgram.Repositories
             return false;
         }
 
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
+        }
     }
 }
