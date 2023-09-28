@@ -9,6 +9,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Get configuration 
+IConfiguration config = builder.Configuration;
+
+// Get secret key from appsettings.json
+string secretKey = config["JwtSettings:SecretKey"];
 // Add services to the container.
 
 builder.Services.AddControllers();
