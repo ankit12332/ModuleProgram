@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ModuleProgram.Interfaces;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ModuleProgram.Models;
 using ModuleProgram.Services;
 
@@ -7,96 +7,110 @@ using ModuleProgram.Services;
 
 namespace ModuleProgram.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
         private readonly UserService _userService;
-        private readonly JwtService _jwtService;
 
-        public UserController(IUserRepository userRepository, JwtService jwtService, UserService userService)
+        public UserController( UserService userService)
         {
-            _userRepository = userRepository;
-            _jwtService = jwtService;
             _userService = userService;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest loginRequest)
-        {
-            var response = await _userService.AuthenticateUserAsync(loginRequest);
-
-            if (response == null)
-            {
-                return Unauthorized("Invalid username or password."); // Authentication failed
-            }
-
-            return Ok(response); // Return the LoginResponse object as JSON
-        }
-
-
         // GET api/User
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _userRepository.GetAllUsersAsync();
-            return Ok(users);
+            try
+            {
+                var users = await _userService.GetAllUsersAsync();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET api/User/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _userService.GetUserByIdAsync(id);
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST api/User
         [HttpPost]
-        public async Task<IActionResult> CreateUser(User user)
+        public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var createdUser = await _userService.CreateUserAsync(user);
+                return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
             }
-
-            var createdUser = await _userRepository.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // PUT api/User/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
-            if (id != user.Id)
+            try
             {
-                return BadRequest();
-            }
+                var existingUser = await _userService.GetUserByIdAsync(id);
+                if (existingUser == null)
+                {
+                    return NotFound();
+                }
 
-            if (!ModelState.IsValid)
+                user.Id = id; // Ensure the user's ID is preserved.
+                await _userService.UpdateUserAsync(user);
+                return NoContent();
+            }
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-
-            await _userRepository.UpdateUserAsync(user);
-            return NoContent();
         }
 
         // DELETE: api/User/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var deleted = await _userRepository.DeleteUserAsync(id);
-            if (!deleted)
+            try
             {
-                return NotFound();
+                var deleted = await _userService.DeleteUserAsync(id);
+                if (!deleted)
+                {
+                    return NotFound();
+                }
+                return NoContent();
             }
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

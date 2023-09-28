@@ -6,42 +6,40 @@ namespace ModuleProgram.Services
     public class UserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IConfiguration _configuration;
 
-        public UserService(IUserRepository userRepository, IConfiguration configuration)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _configuration = configuration;
         }
 
-        public async Task<LoginResponse?> AuthenticateUserAsync(LoginRequest loginRequest)
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            // Perform authentication logic (e.g., validate username and password)
-            var user = await _userRepository.GetUserByUsernameAsync(loginRequest.Username);
-
-            if (user != null && ValidatePassword(user, loginRequest.Password))
-            {
-                // If the user is valid, generate and return a JWT token
-                var jwtService = new JwtService(_configuration);
-                var token = jwtService.GenerateToken(user);
-
-                // Return user details and token
-                return new LoginResponse
-                {
-                    Name = user.Name,
-                    Username = user.Username,
-                    Password = user.Password, // Note: Avoid returning passwords in practice
-                    CreatedAt = user.CreatedAt,
-                    Token = token
-                };
-            }
-
-            return null; // Authentication failed
+            return await _userRepository.GetAllUsersAsync();
         }
 
-        private bool ValidatePassword(User user, string password)
+        public async Task<User> GetUserByIdAsync(int id)
         {
-            return user.Password == password;
+            return await _userRepository.GetUserByIdAsync(id);
+        }
+
+        public async Task<User> CreateUserAsync(User user)
+        {
+            return await _userRepository.CreateUserAsync(user);
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<bool> DeleteUserAsync(int id)
+        {
+            return await _userRepository.DeleteUserAsync(id);
+        }
+
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            return await _userRepository.GetUserByUsernameAsync(username);
         }
     }
 }

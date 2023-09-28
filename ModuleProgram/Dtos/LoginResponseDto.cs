@@ -1,7 +1,8 @@
-﻿namespace ModuleProgram.Models
+﻿namespace ModuleProgram.Dtos
 {
-    public class LoginResponse
+    public class LoginResponseDto
     {
+        public int Id { get; set; }
         public string? Name { get; set; }
         public string? Username { get; set; }
         public string? Password { get; set; }
