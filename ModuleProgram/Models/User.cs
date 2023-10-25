@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ModuleProgram.Models.Relation;
+using System.ComponentModel.DataAnnotations;
 
 namespace ModuleProgram.Models
 {
@@ -20,5 +21,7 @@ namespace ModuleProgram.Models
         public string? Password { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public List<UserRole> UserRoles { get; set; }
     }
 }

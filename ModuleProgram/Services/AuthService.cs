@@ -22,7 +22,7 @@ namespace ModuleProgram.Services
             if (user != null && ValidatePassword(user, loginRequest.Password))
             {
                 // If the user is valid, generate and store tokens in cookies
-                _jwtService.GenerateToken(user);
+                var token = _jwtService.GenerateToken(user);
 
                 // Return user details and any other necessary information
                 return new LoginResponseDto
@@ -30,8 +30,7 @@ namespace ModuleProgram.Services
                     Id = user.Id,
                     Name = user.Name,
                     Username = user.Username,
-                    Password = user.Password,
-                    CreatedAt = user.CreatedAt,
+                    Token = token,
                     // You can choose to return any other information here
                 };
             }

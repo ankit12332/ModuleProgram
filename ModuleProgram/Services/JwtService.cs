@@ -17,7 +17,7 @@ namespace ModuleProgram.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public void GenerateToken(User user)
+        public string GenerateToken(User user)
         {
             var claims = new[]
             {
@@ -51,6 +51,8 @@ namespace ModuleProgram.Services
                 HttpOnly = true, // Make the cookie accessible only from the server
                 // You can configure other options like expiration, domain, and more as needed.
             });
+
+            return jwt;
 
         }
     }

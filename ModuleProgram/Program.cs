@@ -2,14 +2,28 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ModuleProgram.Context;
+using ModuleProgram.Data.Context;
 using ModuleProgram.Filters;
 using ModuleProgram.Interfaces;
+using ModuleProgram.Interfaces.Tagging;
 using ModuleProgram.Repositories;
+using ModuleProgram.Repositories.Tagging;
 using ModuleProgram.Services;
 using System.Text;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+        });
+});
+
 
 // Get configuration 
 IConfiguration config = builder.Configuration;
@@ -67,6 +81,13 @@ builder.Services.AddScoped<JwtService>();
 
 // Configure UserRepository with dependency injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
+builder.Services.AddScoped<ISubmoduleRepository, SubmoduleRepository>();
+builder.Services.AddScoped<IProgrammRepository, ProgrammRepository>();
+//builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
@@ -83,6 +104,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication(); // Enable JWT authentication
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 

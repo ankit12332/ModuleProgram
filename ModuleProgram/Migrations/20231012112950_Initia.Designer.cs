@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ModuleProgram.Context;
+using ModuleProgram.Data.Context;
 
 #nullable disable
 
 namespace ModuleProgram.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230921041800_userEntityUpdated")]
-    partial class userEntityUpdated
+    [Migration("20231012112950_Initia")]
+    partial class Initia
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
